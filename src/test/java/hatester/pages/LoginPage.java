@@ -1,4 +1,6 @@
 package hatester.pages;
 
-public class LoginPage {
+import hatester.common.BasePage;
+
+public class LoginPage extends BasePage {
 }

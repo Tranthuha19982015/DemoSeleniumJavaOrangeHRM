@@ -1,4 +1,6 @@
 package hatester.testcases;
 
-public class LoginTest {
+import hatester.common.BaseTest;
+
+public class LoginTest extends BaseTest {
 }
