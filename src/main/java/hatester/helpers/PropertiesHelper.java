@@ -32,10 +32,8 @@ public class PropertiesHelper {
 
     public static void setFile(String relPropertiesFilePath) {
         properties = new Properties();
-        try {
-            try (FileInputStream fis = new FileInputStream(SystemHelper.getCurrentDir() + relPropertiesFilePath)) {
-                properties.load(fis);
-            }
+        try (FileInputStream fis = new FileInputStream(SystemHelper.getCurrentDir() + relPropertiesFilePath)) {
+            properties.load(fis);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -43,10 +41,8 @@ public class PropertiesHelper {
 
     public static void setDefaultFile() {
         properties = new Properties();
-        try {
-            try (FileInputStream fis = new FileInputStream(SystemHelper.getCurrentDir() + relPropertiesFilePathDefault)) {
-                properties.load(fis);
-            }
+        try (FileInputStream fis = new FileInputStream(SystemHelper.getCurrentDir() + relPropertiesFilePathDefault)) {
+            properties.load(fis);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -94,7 +90,6 @@ public class PropertiesHelper {
                 properties.setProperty(key, value);
                 properties.store(fos, null);
             }
-
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
