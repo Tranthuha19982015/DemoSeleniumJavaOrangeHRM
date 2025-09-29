@@ -12,6 +12,7 @@ import org.testng.Assert;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 
 public class WebUI {
@@ -33,7 +34,7 @@ public class WebUI {
     }
 
     //Hàm trả về 1 phần tử WebElement
-    public static WebElement getWebElemtent(By by) {
+    public static WebElement getWebElement(By by) {
         return DriverManager.getDriver().findElement(by);  //Nếu không tìm thấy → Selenium ném NoSuchElementException.
     }
 
@@ -42,16 +43,18 @@ public class WebUI {
         return DriverManager.getDriver().findElements(by);  //Nếu không tìm thấy → trả về list rỗng (không ném exception).
     }
 
+    // highlight phần tử
     public static void highlightElement(By by) {
         JavascriptExecutor js = (JavascriptExecutor) DriverManager.getDriver();
-        js.executeScript("arguments[0].style.border='3px solid red';", getWebElemtent(by));
+        js.executeScript("arguments[0].style.border='3px solid red';", getWebElement(by));
     }
 
     public static void highlightElement(By by, String color) {
         JavascriptExecutor js = (JavascriptExecutor) DriverManager.getDriver();
-        js.executeScript("arguments[0].style.border='3px solid " + color + "';", getWebElemtent(by));
+        js.executeScript("arguments[0].style.border='3px solid " + color + "';", getWebElement(by));
     }
 
+    //đợi phần tử hiển thị lên giao diện (có trong DOM)
     public static WebElement waitForElementVisible(By by) {
         WebElement element = null;
         try {
@@ -80,6 +83,7 @@ public class WebUI {
         return element;
     }
 
+    //đợi phần tử hiển thị lên giao diện và enable
     public static WebElement waitForElementToBeClickable(By by) {
         WebElement element = null;
         try {
@@ -149,6 +153,7 @@ public class WebUI {
         }
     }
 
+    //chờ trang load
     public static void waitForPageLoaded() {
         WebDriverWait wait = new WebDriverWait(DriverManager.getDriver(), Duration.ofSeconds(WAIT_TIMEOUT), Duration.ofMillis(500));
         JavascriptExecutor js = (JavascriptExecutor) DriverManager.getDriver();
@@ -182,6 +187,8 @@ public class WebUI {
         }
     }
 
+    //Chờ cho đến khi frame có trong DOM và sẵn sàng.
+    //Khi có, tự động switch driver sang frame đó.
     public static void waitForSwitchToFrameWhenAvailable(By by) {
         try {
             WebDriverWait wait = new WebDriverWait(DriverManager.getDriver(), Duration.ofSeconds(WAIT_TIMEOUT), Duration.ofMillis(500));
@@ -193,42 +200,37 @@ public class WebUI {
         }
     }
 
-    public static void switchToDefaultContent(By by) {
+    //chuyển context điều khiển Selenium từ trong một iframe/frame về lại main document
+    public static void switchToDefaultContent() {
         DriverManager.getDriver().switchTo().defaultContent();
         logConsole("Switched back to default content");
     }
 
     public static boolean checkElementExist(By by) {
-        waitForElementVisible(by);
+        waitForPageLoaded();
         List<WebElement> listElement = getWebElements(by);
 
         if (listElement.size() > 0) {
             logConsole("checkElementExist: " + true + " --- " + by);
             return true;
         } else {
-            System.out.println("checkElementExist: " + false + " --- " + by);
+            logConsole("checkElementExist: " + false + " --- " + by);
             return false;
         }
     }
 
     // Hàm kiểm tra sự tồn tại của phần tử với lặp lại nhiều lần
     public static boolean checkElementExist(By by, int maxRetries, int waitTimeMillis) {
-        int retryCount = 0;
-        while (retryCount < maxRetries) {
+        for (int attempt = 0; attempt < maxRetries; attempt++) {
+            if (!getWebElements(by).isEmpty()) {
+                logConsole("Tìm thấy phần tử ở lần thứ " + (attempt + 1));
+                return true;
+            }
+            logConsole("Không tìm thấy phần tử. Thử lại lần " + (attempt + 1));
             try {
-                WebElement element = getWebElemtent(by);
-                if (element != null) {
-                    logConsole("Tìm thấy phần tử ở lần thứ " + (retryCount + 1));
-                    return true;
-                }
-            } catch (NoSuchElementException e) {
-                logConsole("Không tìm thấy phần tử. Thử lại lần " + (retryCount + 1));
-                retryCount++;
-                try {
-                    Thread.sleep(waitTimeMillis); // Chờ trước khi thử lại
-                } catch (InterruptedException ie) {
-                    ie.printStackTrace();
-                }
+                Thread.sleep(waitTimeMillis); // Chờ trước khi thử lại
+            } catch (InterruptedException ie) {
+                ie.printStackTrace();
             }
         }
         // Trả về false nếu không tìm thấy phần tử sau maxRetries lần
@@ -236,11 +238,25 @@ public class WebUI {
         return false;
     }
 
+    //Hàm kiểm tra tồn tại với WebDriverWait
+    public static boolean checkElementExist(By by, int timeoutSeconds) {
+        try {
+            WebDriverWait wait = new WebDriverWait(DriverManager.getDriver(), Duration.ofSeconds(timeoutSeconds), Duration.ofMillis(500));
+            //driver trong lambda là WebDriver hiện tại, Selenium tự inject.
+            //Không cần gọi DriverManager.getDriver() trong lambda nữa.
+            wait.until(driver -> !driver.findElements(by).isEmpty()); //Chờ cho đến khi driver.findElements(by) tìm thấy ít nhất một phần tử (list không rỗng) - xuất hiện trong DOM.
+            logConsole("Tìm thấy phần tử (wait)." + by);
+            return true;
+        } catch (TimeoutException e) {
+            logConsole("Không tìm thấy phần tử sau " + timeoutSeconds + "s: " + by);
+            return false;
+        }
+    }
+
     public static void openURL(String url) {
         DriverManager.getDriver().get(url);
-        sleep(STEP_TIME);
-        logConsole("Open: " + url);
         waitForPageLoaded();
+        logConsole("Open: " + url);
     }
 
     public static void clickToElement(By by) {
@@ -258,6 +274,15 @@ public class WebUI {
     public static void clearElementText(By by) {
         sleep(STEP_TIME);
         waitForElementVisible(by).clear();
+        logConsole("Clear text of element: " + by.toString());
+    }
+
+    //Cách này mạnh hơn .clear(), đặc biệt trong các input được custom bằng JavaScript, vì .clear() đôi khi không xóa hết giá trị.
+    public static void clearElementTextActions(By by) {
+        sleep(STEP_TIME);
+        WebElement element = waitForElementVisible(by);
+        element.sendKeys(Keys.CONTROL + "a");
+        element.sendKeys(Keys.DELETE);
         logConsole("Clear text of element: " + by.toString());
     }
 
@@ -293,14 +318,16 @@ public class WebUI {
         return text;
     }
 
-    public static String getElementAttribute(By by, String attribute) {
+    public static String getElementAttribute(By by, String value) {
         sleep(STEP_TIME);
         logConsole("Get attribute of element: " + by.toString());
-        String text = waitForElementVisible(by).getAttribute(attribute);
+        String text = waitForElementVisible(by).getAttribute(value);
         logConsole("===>Attribute = \"" + text + "\"");
         return text;
     }
 
+    //Dùng nhiều trong UI testing (visual check, style validation).
+    //Trả về chuỗi, thường ở dạng chuẩn của browser (ví dụ: rgba(0, 0, 0, 1) thay vì #000)
     public static String getElementCSSValue(By by, String cssPropertyName) {
         sleep(STEP_TIME);
         logConsole("Get CSS Value: " + cssPropertyName + " of element: " + by.toString());
@@ -309,14 +336,18 @@ public class WebUI {
         return value;
     }
 
+    //Cuộn trang để element chỉ định nằm gọn ở đầu trang hiển thị (viewport).
     public static void scrollToElementAtTop(By by) {
         JavascriptExecutor js = (JavascriptExecutor) DriverManager.getDriver();
         js.executeScript("arguments[0].scrollIntoView(true);", waitForElementVisible(by));
+//        logConsole("Scroll to element at top: " + by.toString());
     }
 
+    //Cuộn trang để element chỉ định nằm gọn ở cuối trang hiển thị (viewport).
     public static void scrollToElementAtBottom(By by) {
         JavascriptExecutor js = (JavascriptExecutor) DriverManager.getDriver();
         js.executeScript("arguments[0].scrollIntoView(false);", waitForElementVisible(by));
+//        logConsole("Scroll to element at bottom: " + by.toString());
     }
 
     //hàm này ít dùng hoặc hạn chế dùng do kích thước màn hình mỗi ng khác nhau
@@ -325,10 +356,11 @@ public class WebUI {
         js.executeScript("window.scrollTo(" + X + "," + Y + ");");
     }
 
+    //Hàm này dùng để hover chuột tới một element.
     public static boolean moveToElement(By by) {
         try {
             Actions actions = new Actions(DriverManager.getDriver());
-            actions.moveToElement(getWebElemtent(by)).release().build().perform();
+            actions.moveToElement(getWebElement(by)).release().build().perform();
             return true;
         } catch (Exception e) {
             logConsole(e.getMessage());
@@ -347,10 +379,11 @@ public class WebUI {
         }
     }
 
+    //Hàm này dùng để hover chuột tới một element.
     public static boolean hoverElement(By by) {
         try {
             Actions actions = new Actions(DriverManager.getDriver());
-            actions.moveToElement(getWebElemtent(by)).perform();
+            actions.moveToElement(getWebElement(by)).perform();
             return true;
         } catch (Exception e) {
             logConsole(e.getMessage());
@@ -358,10 +391,11 @@ public class WebUI {
         }
     }
 
+    // Hàm này kéo phần tử từ fromElement đến toElement bằng dragAndDrop (Selenium sẽ tự động thêm release()).
     public static boolean dragAndDrop(By fromElement, By toElement) {
         try {
             Actions actions = new Actions(DriverManager.getDriver());
-            actions.dragAndDrop(getWebElemtent(fromElement), getWebElemtent(toElement)).perform();
+            actions.dragAndDrop(getWebElement(fromElement), getWebElement(toElement)).perform();
             return true;
         } catch (Exception e) {
             logConsole(e.getMessage());
@@ -369,10 +403,12 @@ public class WebUI {
         }
     }
 
+    // Hàm này kéo phần tử từ fromElement đến toElement bằng clickAndHold
+    // Với nhiều web dùng HTML5/React/Angular thì dragAndDrop() mặc định của Selenium hay fail, còn cách này thường ổn hơn
     public static boolean dragAndDropElement(By fromElement, By toElement) {
         try {
             Actions actions = new Actions(DriverManager.getDriver());
-            actions.clickAndHold(getWebElemtent(fromElement)).moveToElement(getWebElemtent(toElement)).release(getWebElemtent(toElement)).build().perform();
+            actions.clickAndHold(getWebElement(fromElement)).moveToElement(getWebElement(toElement)).release(getWebElement(toElement)).build().perform();
             return true;
         } catch (Exception e) {
             logConsole(e.getMessage());
@@ -380,10 +416,12 @@ public class WebUI {
         }
     }
 
+    //Kéo thả theo tọa độ cụ thể
+    //Linh hoạt trong các tình huống không có phần tử đích (ví dụ: kéo slider, drag trong canvas, kéo map Google).
     public static boolean dragAndDropOffset(By fromElement, int X, int Y) {
         try {
             Actions actions = new Actions(DriverManager.getDriver());
-            actions.clickAndHold(getWebElemtent(fromElement)).pause(1).moveByOffset(X, Y).release().build().perform();
+            actions.clickAndHold(getWebElement(fromElement)).pause(Duration.ofMillis(500)).moveByOffset(X, Y).release().build().perform();
             return true;
         } catch (Exception e) {
             logConsole(e.getMessage());
@@ -394,7 +432,7 @@ public class WebUI {
     public static boolean clickElementByActions(By by) {
         try {
             Actions actions = new Actions(DriverManager.getDriver());
-            actions.moveToElement(getWebElemtent(by)).click().build().perform();
+            actions.moveToElement(getWebElement(by)).click().build().perform();
             return true;
         } catch (Exception e) {
             logConsole(e.getMessage());
