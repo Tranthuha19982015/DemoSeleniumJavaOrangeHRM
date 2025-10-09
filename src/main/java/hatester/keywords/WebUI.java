@@ -63,8 +63,8 @@ public class WebUI {
             highlightElement(by);
             return element;
         } catch (Throwable error) {
-            logConsole("Timeout waiting for the element Visible. " + by.toString());
-            Assert.fail("Timeout waiting for the element Visible." + by.toString());
+            logConsole("Timeout waiting for the element to be Visible: " + by.toString());
+            Assert.fail("Timeout waiting for the element to be Visible: " + by.toString());
         }
         return element;
     }
@@ -77,8 +77,8 @@ public class WebUI {
             highlightElement(by);
             return element;
         } catch (Throwable error) {
-            logConsole("Timeout waiting for the element Visible. " + by.toString());
-            Assert.fail("Timeout waiting for the element Visible. " + by.toString());
+            logConsole("Timeout waiting for the element to be Visible: " + by.toString() + " within " + waitTimeout + " seconds.");
+            Assert.fail("Timeout waiting for the element to be Visible: " + by.toString() + " within " + waitTimeout + " seconds.");
         }
         return element;
     }
@@ -92,8 +92,8 @@ public class WebUI {
             highlightElement(by);
             return element;
         } catch (Throwable error) {
-            logConsole("Timeout waiting for the element To Be Clickable. " + by.toString());
-            Assert.fail("Timeout waiting for the element To Be Clickable. " + by.toString());
+            logConsole("Timeout waiting for the element to be Clickable: " + by.toString());
+            Assert.fail("Timeout waiting for the element to be Clickable: " + by.toString());
         }
         return element;
     }
@@ -106,8 +106,8 @@ public class WebUI {
             highlightElement(by);
             return element;
         } catch (Throwable error) {
-            logConsole("Timeout waiting for the element To Be Clickable. " + by.toString());
-            Assert.fail("Timeout waiting for the element To Be Clickable. " + by.toString());
+            logConsole("Timeout waiting for the element to be Clickable. " + by.toString() + " within " + waitTimeout + " seconds.");
+            Assert.fail("Timeout waiting for the element to be Clickable. " + by.toString() + " within " + waitTimeout + " seconds.");
         }
         return element;
     }
@@ -121,8 +121,8 @@ public class WebUI {
             highlightElement(by);
             return element;
         } catch (Throwable error) {
-            logConsole("Element not exist. " + by.toString());
-            Assert.fail("Element not exist. " + by.toString());
+            logConsole("Element not exist: " + by.toString());
+            Assert.fail("Element not exist: " + by.toString());
         }
         return element;
     }
@@ -135,8 +135,8 @@ public class WebUI {
             highlightElement(by);
             return element;
         } catch (Throwable error) {
-            logConsole("Element not exist. " + by.toString());
-            Assert.fail("Element not exist. " + by.toString());
+            logConsole("Element not exist: " + by.toString() + " within " + waitTimeout + " seconds.");
+            Assert.fail("Element not exist: " + by.toString() + " within " + waitTimeout + " seconds.");
         }
         return element;
     }
@@ -148,8 +148,8 @@ public class WebUI {
             WebDriverWait wait = new WebDriverWait(DriverManager.getDriver(), Duration.ofSeconds(WAIT_TIMEOUT), Duration.ofMillis(500));
             wait.until(ExpectedConditions.invisibilityOfElementLocated(by));
         } catch (Throwable error) {
-            logConsole("Timeout waiting for element Not Visible. " + by.toString());
-            Assert.fail("Timeout waiting for element Not Visible. " + by.toString());
+            logConsole("Timeout waiting for the element to become Not Visible: " + by.toString());
+            Assert.fail("Timeout waiting for the element to become Not Visible: " + by.toString());
         }
     }
 
@@ -223,10 +223,10 @@ public class WebUI {
     public static boolean checkElementExist(By by, int maxRetries, int waitTimeMillis) {
         for (int attempt = 0; attempt < maxRetries; attempt++) {
             if (!getWebElements(by).isEmpty()) {
-                logConsole("Tìm thấy phần tử ở lần thứ " + (attempt + 1));
+                logConsole("Element found successfully on attempt " + (attempt + 1));
                 return true;
             }
-            logConsole("Không tìm thấy phần tử. Thử lại lần " + (attempt + 1));
+            logConsole("Element not found. Retrying attempt " + (attempt + 1));
             try {
                 Thread.sleep(waitTimeMillis); // Chờ trước khi thử lại
             } catch (InterruptedException ie) {
@@ -234,7 +234,7 @@ public class WebUI {
             }
         }
         // Trả về false nếu không tìm thấy phần tử sau maxRetries lần
-        logConsole("Không tìm thấy phần tử sau " + maxRetries + " lần thử.");
+        logConsole("Element not found after " + maxRetries + " attempts.");
         return false;
     }
 
@@ -244,11 +244,12 @@ public class WebUI {
             WebDriverWait wait = new WebDriverWait(DriverManager.getDriver(), Duration.ofSeconds(timeoutSeconds), Duration.ofMillis(500));
             //driver trong lambda là WebDriver hiện tại, Selenium tự inject.
             //Không cần gọi DriverManager.getDriver() trong lambda nữa.
-            wait.until(driver -> !driver.findElements(by).isEmpty()); //Chờ cho đến khi driver.findElements(by) tìm thấy ít nhất một phần tử (list không rỗng) - xuất hiện trong DOM.
-            logConsole("Tìm thấy phần tử (wait)." + by);
+            wait.until(ExpectedConditions.visibilityOfElementLocated(by)); //Chờ cho đến khi driver.findElements(by) tìm thấy ít nhất một phần tử (list không rỗng) - xuất hiện trong DOM.
+            highlightElement(by);
+            logConsole("Element found: " + by.toString() + " within " + timeoutSeconds + " seconds.");
             return true;
         } catch (TimeoutException e) {
-            logConsole("Không tìm thấy phần tử sau " + timeoutSeconds + "s: " + by);
+            logConsole("Element not found: " + by.toString() + " within " + timeoutSeconds + " seconds.");
             return false;
         }
     }

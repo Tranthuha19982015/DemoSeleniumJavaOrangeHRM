@@ -11,32 +11,31 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ExcelHelper {
-    private Workbook wb;
-    private Sheet sh;
-    private Cell cell;
-    private CellStyle defaultCellStyle;
-    private String excelFilePath;
-    private Map<String, Integer> columns = new HashMap<>();
+    private Workbook wb; //Đại diện cho toàn bộ file Excel (có thể chứa nhiều sheet).
+    private Sheet sh; //Đại diện cho một sheet cụ thể trong workbook.
+    //private Cell cell; //Đại diện cho một ô (cell) trong sheet.
+    private CellStyle defaultCellStyle; //Dùng để định dạng style mặc định cho cell (căn giữa, màu nền, font, …).
+    private String excelFilePath; //Lưu đường dẫn file Excel để ghi ngược lại khi sửa dữ liệu.
+    private Map<String, Integer> columns = new HashMap<>(); //Map lưu tên cột → vị trí cột (index). Dựa vào hàng đầu tiên (header).
 
     public void setExcelFile(String excelPath, String sheetName) {
         try {
-            //Tạo một File object đại diện cho đường dẫn file Excel (excelPath).
+            //Tạo một đối tượng File đại diện cho đường dẫn file Excel (excelPath).
             //Chỉ là tham chiếu đường dẫn, chưa mở file thật.
             File f = new File(excelPath);
 
             //Kiểm tra file có tồn tại trong ổ cứng không.
             if (!f.exists()) {
                 //Nếu lỗi do input không hợp lệ (file ko tồn tại, sheet ko tồn tại) → dùng IllegalArgumentException.
-                throw new IllegalArgumentException("File doesn't exist." + excelPath);
+                throw new IllegalArgumentException("File doesn't exist: " + excelPath);
             }
 
             //Nếu file tồn tại → tạo FileInputStream để mở file Excel ra đọc.
             try (FileInputStream fis = new FileInputStream(f)) {
 
                 //Từ fis (luồng đọc file), Apache POI sẽ tạo ra một Workbook object trong bộ nhớ.
-                // Workbook là bản sao file Excel để bạn thao tác mà không ảnh hưởng trực tiếp đến file gốc.
+                // Workbook là bản sao file Excel để thao tác mà không ảnh hưởng trực tiếp đến file gốc.
                 wb = WorkbookFactory.create(fis);
-
                 sh = wb.getSheet(sheetName);  //Tìm sheet theo tên (sheetName) trong workbook vừa load.
 
                 if (sh == null) {
@@ -51,13 +50,28 @@ public class ExcelHelper {
                     throw new IllegalArgumentException("Sheet '" + sheetName + "' does not have a header row (row 0).");
                 }
 
-                //Duyệt qua tất cả các cell trong dòng header.
+                //Duyệt qua tất cả các ô (cell) trong dòng header.
                 //Lưu vào Map<String, Integer> columns
                 headerRow.forEach(cell -> {
                     if (cell != null && cell.getCellType() == CellType.STRING) {
                         columns.put(cell.getStringCellValue().trim(), cell.getColumnIndex());
                     }
                 });
+
+                //Dùng DataFormatter để lấy giá trị hiển thị (Hỗ trợ mọi kiểu dữ liệu trong header)
+                //DataFormatter formatter = new DataFormatter();
+                //if (cell != null) {
+                //    String header = formatter.formatCellValue(cell).trim();
+                //    if (!header.isEmpty()) {
+                //        columns.put(header, cell.getColumnIndex());
+                //    }
+                //}
+
+                // Tạo style
+                defaultCellStyle = wb.createCellStyle();
+                defaultCellStyle.setFillPattern(FillPatternType.NO_FILL);
+                defaultCellStyle.setAlignment(HorizontalAlignment.CENTER);
+                defaultCellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -65,19 +79,26 @@ public class ExcelHelper {
         }
     }
 
+    private void validateWorkbook() {
+        if (wb == null || sh == null)
+            throw new IllegalStateException("Workbook or sheet not initialized. Call setExcelFile() first.");
+    }
+
+    //Lấy dữ liệu từ cell theo vị trí cột và dòng.
     public String getCellData(int columnIndex, int rowIndex) {
+        validateWorkbook();
         Row row = sh.getRow(rowIndex);
         if (row == null) {
             return ""; // Row không tồn tại
         }
 
-        cell = row.getCell(columnIndex);
+        Cell cell = row.getCell(columnIndex);
         if (cell == null) {
             return ""; // Cell không tồn tại
         }
 
         try {
-            switch (cell.getCellType()) {
+            switch (cell.getCellType()) { //kiểm tra kiểu dữ liệu của ô
                 case STRING:
                     return cell.getStringCellValue();
                 case NUMERIC:
@@ -105,7 +126,9 @@ public class ExcelHelper {
         }
     }
 
+    //Lấy dữ liệu từ cell theo tên cột và dòng.
     public String getCellData(String columnName, int rowIndex) {
+        validateWorkbook();
         Integer columnIndex = columns.get(columnName);
         if (columnIndex == null) {
             throw new IllegalArgumentException("Column '" + columnName + "' not found in sheet.");
@@ -114,14 +137,16 @@ public class ExcelHelper {
 
     }
 
-    public void setCellData(String text, int columnIndex, int rowIndex) {
+    private void writeCellData(String text, int columnIndex, int rowIndex) {
+        validateWorkbook();
+
         try {
             Row row = sh.getRow(rowIndex);
             if (row == null) {
                 row = sh.createRow(rowIndex);
             }
 
-            cell = row.getCell(columnIndex);
+            Cell cell = row.getCell(columnIndex);
             if (cell == null) {
                 cell = row.createCell(columnIndex);
             }
@@ -129,55 +154,45 @@ public class ExcelHelper {
             // Set giá trị cho cell
             cell.setCellValue(text != null ? text : "");
 
-            // Tạo style một lần duy nhất (lazy initialization)
-            if (defaultCellStyle == null) {
-                XSSFCellStyle style = (XSSFCellStyle) wb.createCellStyle();
-                style.setFillPattern(FillPatternType.NO_FILL);
-                style.setAlignment(HorizontalAlignment.CENTER);
-                style.setVerticalAlignment(VerticalAlignment.CENTER);
-                defaultCellStyle = style;
-            }
-
             cell.setCellStyle(defaultCellStyle);
-
-            // Ghi workbook ra file (try-with-resources)
-            try (FileOutputStream fos = new FileOutputStream(excelFilePath)) {
-                wb.write(fos);
-            }
         } catch (Exception e) {
             throw new RuntimeException("Failed to set cell data at row " + rowIndex + ", column " + columnIndex, e);
         }
     }
 
+    public void setCellData(String text, int columnIndex, int rowIndex) {
+        writeCellData(text, columnIndex, rowIndex);
+    }
+
     public void setCellData(String text, String columnName, int rowIndex) {
+        Integer columnIndex = columns.get(columnName);
+        if (columnIndex == null) {
+            throw new IllegalArgumentException("Column '" + columnName + "' not found in sheet.");
+        }
+        writeCellData(text, columnIndex, rowIndex);
+    }
+
+    public synchronized void saveChanges() {
+        validateWorkbook();
+        try (FileOutputStream fos = new FileOutputStream(excelFilePath)) {
+            wb.write(fos);
+        } catch (Exception e) {
+            throw new RuntimeException("Error saving workbook: " + excelFilePath, e);
+        }
+    }
+
+    public void saveAndClose() {
+        saveChanges();
+        closeWorkbook();
+    }
+
+    public void closeWorkbook() {
         try {
-            Row row = sh.getRow(rowIndex);
-            if (row == null) {
-                row = sh.createRow(rowIndex);
-            }
-
-            cell = row.getCell(columns.get(columnName));
-            if (cell == null) {
-                cell = row.createCell(columns.get(columnName));
-            }
-
-            cell.setCellValue(text != null ? text : "");
-
-            if (defaultCellStyle == null) {
-                XSSFCellStyle style = (XSSFCellStyle) wb.createCellStyle();
-                style.setFillPattern(FillPatternType.NO_FILL);
-                style.setAlignment(HorizontalAlignment.CENTER);
-                style.setVerticalAlignment(VerticalAlignment.CENTER);
-                defaultCellStyle = style;
-            }
-
-            cell.setCellStyle(defaultCellStyle);
-
-            try (FileOutputStream fos = new FileOutputStream(excelFilePath)) {
-                wb.write(fos);
+            if (wb != null) {
+                wb.close();
             }
         } catch (Exception e) {
-            throw new RuntimeException("Failed to set cell data at row " + rowIndex + ", column " + columnName, e);
+            throw new RuntimeException("Error while opening Excel file: " + e.getMessage(), e);
         }
     }
 }
