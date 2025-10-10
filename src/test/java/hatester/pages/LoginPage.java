@@ -38,6 +38,7 @@ public class LoginPage extends BasePage {
         enterEmail(email);
         enterPassword(password);
         clickLogin();
+        WebUI.waitForPageLoaded();
     }
 
     public void loginCRM() {
@@ -48,7 +49,6 @@ public class LoginPage extends BasePage {
     }
 
     public void verifyLoginSuccess() {
-        WebUI.waitForPageLoaded();
-        Assert.assertTrue(WebUI.checkElementExist(menuDashboard,10), "The Dashboard menu is not displayed.");
+        Assert.assertTrue(WebUI.checkElementExist(menuDashboard,5), "The Dashboard menu is not displayed.");
     }
 }

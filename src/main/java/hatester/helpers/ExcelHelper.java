@@ -2,6 +2,7 @@ package hatester.helpers;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -194,5 +195,73 @@ public class ExcelHelper {
         } catch (Exception e) {
             throw new RuntimeException("Error while opening Excel file: " + e.getMessage(), e);
         }
+    }
+
+    public Object[][] getExcelData(String filePath, String sheetName) {
+        Object[][] data = null;
+        try (FileInputStream fis = new FileInputStream(filePath); Workbook workbook = new XSSFWorkbook(fis)) {
+
+            // load the sheet
+            Sheet sh = workbook.getSheet(sheetName);
+            if (sh == null) {
+                throw new IllegalArgumentException("Sheet '" + sheetName + "' not found in file: " + filePath);
+            }
+
+            // load the row
+            Row row = sh.getRow(0);
+            if (row == null) {
+                throw new IllegalStateException("Header row (row 0) is missing in sheet: " + sheetName);
+            }
+
+            int noOfRows = sh.getPhysicalNumberOfRows();
+            if (noOfRows < 2) {
+                throw new IllegalStateException("Sheet '" + sheetName + "' has no data rows.");
+            }
+
+            int noOfCols = row.getLastCellNum();
+
+            System.out.println(noOfRows + " - " + noOfCols);
+
+            Cell cell;
+            data = new Object[noOfRows - 1][noOfCols];
+
+            for (int i = 1; i < noOfRows; i++) {
+                for (int j = 0; j < noOfCols; j++) {
+                    row = sh.getRow(i);
+                    cell = row.getCell(j);
+
+                    switch (cell.getCellType()) {
+                        case STRING:
+                            data[i - 1][j] = cell.getStringCellValue();
+                            break;
+                        case NUMERIC:
+                            if (DateUtil.isCellDateFormatted(cell)) {
+                                data[i - 1][j] = new SimpleDateFormat("yyyy-MM-dd").format(cell.getDateCellValue());
+                            } else {
+                                // Nếu là số nguyên thì ép kiểu về long, nếu là số thực thì để nguyên
+                                double numericValue = cell.getNumericCellValue();
+                                if (numericValue == Math.floor(numericValue)) {  //Math.floor(x) = làm tròn xuống giá trị nguyên gần nhất ≤ x
+                                    data[i - 1][j] = String.valueOf((long) numericValue); // Số nguyên
+                                } else {
+                                    data[i - 1][j] = String.valueOf(numericValue); // Số thực
+                                }
+                            }
+                            break;
+                        case BOOLEAN:
+                            data[i - 1][j] = Boolean.toString(cell.getBooleanCellValue()); //HOẶC dùng String.valueOf(cell.getBooleanCellValue());
+                            break;
+                        case BLANK:
+                            data[i - 1][j] = cell.getStringCellValue();
+                            break;
+                        default:
+                            data[i - 1][j] = cell.getStringCellValue();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("The exception is:" + e.getMessage());
+            throw new RuntimeException(e);
+        }
+        return data;
     }
 }
