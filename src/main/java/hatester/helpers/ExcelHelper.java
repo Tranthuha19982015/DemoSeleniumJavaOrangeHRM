@@ -59,15 +59,6 @@ public class ExcelHelper {
                     }
                 });
 
-                //Dùng DataFormatter để lấy giá trị hiển thị (Hỗ trợ mọi kiểu dữ liệu trong header)
-                //DataFormatter formatter = new DataFormatter();
-                //if (cell != null) {
-                //    String header = formatter.formatCellValue(cell).trim();
-                //    if (!header.isEmpty()) {
-                //        columns.put(header, cell.getColumnIndex());
-                //    }
-                //}
-
                 // Tạo style
                 defaultCellStyle = wb.createCellStyle();
                 defaultCellStyle.setFillPattern(FillPatternType.NO_FILL);
@@ -138,7 +129,7 @@ public class ExcelHelper {
 
     }
 
-    private void writeCellData(String text, int columnIndex, int rowIndex) {
+    private void setCellData(String text, int columnIndex, int rowIndex) {
         validateWorkbook();
 
         try {
@@ -156,13 +147,13 @@ public class ExcelHelper {
             cell.setCellValue(text != null ? text : "");
 
             cell.setCellStyle(defaultCellStyle);
+
+            try (FileOutputStream fos = new FileOutputStream(excelFilePath)) {
+                wb.write(fos);
+            }
         } catch (Exception e) {
             throw new RuntimeException("Failed to set cell data at row " + rowIndex + ", column " + columnIndex, e);
         }
-    }
-
-    public void setCellData(String text, int columnIndex, int rowIndex) {
-        writeCellData(text, columnIndex, rowIndex);
     }
 
     public void setCellData(String text, String columnName, int rowIndex) {
@@ -170,21 +161,7 @@ public class ExcelHelper {
         if (columnIndex == null) {
             throw new IllegalArgumentException("Column '" + columnName + "' not found in sheet.");
         }
-        writeCellData(text, columnIndex, rowIndex);
-    }
-
-    public synchronized void saveChanges() {
-        validateWorkbook();
-        try (FileOutputStream fos = new FileOutputStream(excelFilePath)) {
-            wb.write(fos);
-        } catch (Exception e) {
-            throw new RuntimeException("Error saving workbook: " + excelFilePath, e);
-        }
-    }
-
-    public void saveAndClose() {
-        saveChanges();
-        closeWorkbook();
+        setCellData(text, columnIndex, rowIndex);
     }
 
     public void closeWorkbook() {
@@ -197,6 +174,7 @@ public class ExcelHelper {
         }
     }
 
+    //Đọc toàn bộ dữ liệu (trừ dòng tiêu đề) trong file Excel → trả về Object[][]
     public Object[][] getExcelData(String filePath, String sheetName) {
         Object[][] data = null;
         try (FileInputStream fis = new FileInputStream(filePath); Workbook workbook = new XSSFWorkbook(fis)) {
@@ -213,22 +191,22 @@ public class ExcelHelper {
                 throw new IllegalStateException("Header row (row 0) is missing in sheet: " + sheetName);
             }
 
-            int noOfRows = sh.getPhysicalNumberOfRows();
-            if (noOfRows < 2) {
+            int noOfRows = sh.getPhysicalNumberOfRows(); //số hàng có dữ liệu thực tế (kể cả header)
+            if (noOfRows < 2) {  //Nếu nhỏ hơn 2 → chỉ có header, chưa có dữ liệu test nào.
                 throw new IllegalStateException("Sheet '" + sheetName + "' has no data rows.");
             }
 
-            int noOfCols = row.getLastCellNum();
+            int noOfCols = row.getLastCellNum(); //Số lượng cột trong dòng tiêu đề
 
             System.out.println(noOfRows + " - " + noOfCols);
 
             Cell cell;
-            data = new Object[noOfRows - 1][noOfCols];
+            data = new Object[noOfRows - 1][noOfCols];  //Mỗi dòng dữ liệu (bỏ dòng header) là 1 hàng trong data
 
             for (int i = 1; i < noOfRows; i++) {
                 for (int j = 0; j < noOfCols; j++) {
                     row = sh.getRow(i);
-                    cell = row.getCell(j);
+                    cell = row.getCell(j);  //lấy ô tại vị trí cột j trong dòng i
 
                     switch (cell.getCellType()) {
                         case STRING:
@@ -251,10 +229,10 @@ public class ExcelHelper {
                             data[i - 1][j] = Boolean.toString(cell.getBooleanCellValue()); //HOẶC dùng String.valueOf(cell.getBooleanCellValue());
                             break;
                         case BLANK:
-                            data[i - 1][j] = cell.getStringCellValue();
+                            data[i - 1][j] = "";
                             break;
                         default:
-                            data[i - 1][j] = cell.getStringCellValue();
+                            data[i - 1][j] = "";
                     }
                 }
             }
@@ -262,6 +240,6 @@ public class ExcelHelper {
             System.out.println("The exception is:" + e.getMessage());
             throw new RuntimeException(e);
         }
-        return data;
+        return data;  //Trả mảng Object[][] để DataProvider hoặc test script dùng
     }
 }
