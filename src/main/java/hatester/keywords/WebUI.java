@@ -258,7 +258,7 @@ public class WebUI {
     public static void openURL(String url) {
         DriverManager.getDriver().get(url);
         waitForPageLoaded();
-        LogUtils.info("Open: " + url);
+        LogUtils.info("Open URL: " + url);
     }
 
     public static void clickToElement(By by) {

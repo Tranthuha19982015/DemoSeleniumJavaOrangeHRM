@@ -6,15 +6,29 @@ import hatester.helpers.PropertiesHelper;
 import hatester.pages.LoginPage;
 import org.testng.annotations.Test;
 
-public class LoginTest extends BaseTest {
-    LoginPage loginPage;
+import java.util.Hashtable;
 
-    @Test(priority = 1, dataProvider = "data_provider_login_excel", dataProviderClass = DataProviderFactory.class)
-    public void testLoginSuccess(String email, String password) {
+public class LoginTest extends BaseTest {
+    private LoginPage loginPage;
+
+    @Test(priority = 1, dataProvider = "data_login_excel_success", dataProviderClass = DataProviderFactory.class)
+    public void testLoginSuccess(Hashtable< String, String > data) {
         loginPage = new LoginPage();
-        loginPage.openCRM(PropertiesHelper.getValue("URL"));
-        loginPage.verifyHeaderLoginDisplay();
-        loginPage.loginCRM(email, password);
+        loginPage.loginCRM(data.get("EMAIL"), data.get("PASSWORD"));
         loginPage.verifyLoginSuccess();
+    }
+
+    @Test(priority = 2, dataProvider = "data_login_excel_email_invalid", dataProviderClass = DataProviderFactory.class)
+    public void testLoginFailedWithEmailInvalid(Hashtable < String, String > data) {
+        loginPage = new LoginPage();
+        loginPage.loginCRM(data.get("EMAIL"), data.get("PASSWORD"));
+        loginPage.verifyLoginFailedWithEmailOrPasswordInvalid();
+    }
+
+    @Test(priority = 3, dataProvider = "data_login_excel_password_invalid", dataProviderClass = DataProviderFactory.class)
+    public void testLoginFailedWithPasswordInvalid(Hashtable < String, String > data) {
+        loginPage = new LoginPage();
+        loginPage.loginCRM(data.get("EMAIL"), data.get("PASSWORD"));
+        loginPage.verifyLoginFailedWithEmailOrPasswordInvalid();
     }
 }
