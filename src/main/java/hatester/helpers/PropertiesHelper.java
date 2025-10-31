@@ -1,5 +1,7 @@
 package hatester.helpers;
 
+import hatester.utils.LogUtils;
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -56,7 +58,7 @@ public class PropertiesHelper {
             }
             value = properties.getProperty(key);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            LogUtils.error(e.getMessage());
         }
         return value;
     }
@@ -69,13 +71,13 @@ public class PropertiesHelper {
             //Ghi vào cùng file Prop với file lấy ra
             String linkFile = SystemHelper.getCurrentDir() + relPropertiesFilePathDefault;
             try (FileOutputStream fos = new FileOutputStream(linkFile)) {
-                System.out.println(linkFile);
+                LogUtils.info(linkFile);
                 properties.setProperty(key, value);
                 properties.store(fos, null);
             }
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            LogUtils.error(e.getMessage());
         }
     }
 
@@ -86,12 +88,12 @@ public class PropertiesHelper {
             }
             //Ghi vào cùng file Prop với file lấy ra
             try (FileOutputStream fos = new FileOutputStream(SystemHelper.getCurrentDir() + linkFilePath)) {
-                System.out.println(SystemHelper.getCurrentDir() + linkFilePath);
+                LogUtils.info(SystemHelper.getCurrentDir() + linkFilePath);
                 properties.setProperty(key, value);
                 properties.store(fos, null);
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            LogUtils.error(e.getMessage());
         }
     }
 }
