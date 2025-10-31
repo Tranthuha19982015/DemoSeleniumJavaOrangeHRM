@@ -2,6 +2,7 @@ package hatester.common;
 
 import hatester.drivers.DriverManager;
 import hatester.helpers.PropertiesHelper;
+import hatester.utils.LogUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -33,7 +34,7 @@ public class BaseTest {
 
         switch (browserName.trim().toLowerCase()) {
             case "chrome":
-                System.out.println("Launching Chrome browser...");
+                LogUtils.info("Launching Chrome browser...");
 
                 ChromeOptions options = new ChromeOptions();
                 if (PropertiesHelper.getValue("HEADLESS").equalsIgnoreCase("true")) {
@@ -43,15 +44,15 @@ public class BaseTest {
                 driver = new ChromeDriver();
                 break;
             case "firefox":
-                System.out.println("Launching Firefox browser...");
+                LogUtils.info("Launching Firefox browser...");
                 driver = new FirefoxDriver();
                 break;
             case "edge":
-                System.out.println("Launching Edge browser...");
+                LogUtils.info("Launching Edge browser...");
                 driver = new EdgeDriver();
                 break;
             default:
-                System.out.println("Browser: " + browserName + " is invalid, Launching Chrome as browser of choice...");
+                LogUtils.info("Browser: " + browserName + " is invalid, Launching Chrome as browser of choice...");
                 driver = new ChromeDriver();
         }
         DriverManager.setDriver(driver); //Set to ThreadLocal
