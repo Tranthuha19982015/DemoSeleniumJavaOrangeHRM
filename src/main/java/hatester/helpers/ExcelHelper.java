@@ -1,5 +1,6 @@
 package hatester.helpers;
 
+import hatester.utils.LogUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -198,7 +199,7 @@ public class ExcelHelper {
 
             int noOfCols = row.getLastCellNum(); //Số lượng cột trong dòng tiêu đề
 
-            System.out.println(noOfRows + " - " + noOfCols);
+            LogUtils.info(noOfRows + " - " + noOfCols);
 
             Cell cell;
             data = new Object[noOfRows - 1][noOfCols];  //Mỗi dòng dữ liệu (bỏ dòng header) là 1 hàng trong data
@@ -237,7 +238,7 @@ public class ExcelHelper {
                 }
             }
         } catch (Exception e) {
-            System.out.println("The exception is:" + e.getMessage());
+            LogUtils.error("The exception is:" + e.getMessage());
             throw new RuntimeException(e);
         }
         return data;  //Trả mảng Object[][] để DataProvider hoặc test script dùng
