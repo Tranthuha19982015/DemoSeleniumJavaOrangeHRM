@@ -7,7 +7,7 @@ import org.testng.annotations.DataProvider;
 
 public class DataProviderFactory {
 
-    @DataProvider(name = "data_provider_login_excel", parallel = true)
+    @DataProvider(name = "data_provider_login_excel", parallel = false)
     public Object[][] dataLoginCRMFromExcel() {
         ExcelHelper excelHelper = new ExcelHelper();
         Object[][] data = excelHelper.getExcelData(SystemHelper.getCurrentDir() + "src/test/resources/datatest_CRM/datatest.xlsx", "Login");
