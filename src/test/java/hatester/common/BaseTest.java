@@ -2,6 +2,7 @@ package hatester.common;
 
 import hatester.drivers.DriverManager;
 import hatester.helpers.PropertiesHelper;
+import hatester.listeners.TestListener;
 import hatester.utils.LogUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -13,6 +14,7 @@ import org.testng.asserts.SoftAssert;
 
 import java.time.Duration;
 
+@Listeners(TestListener.class)
 public class BaseTest {
     public SoftAssert softAssert;
 
