@@ -218,11 +218,9 @@ public class WebUI {
 
         if (listElement.size() > 0) {
             LogUtils.info("checkElementExist: " + true + " --- " + by);
-            ExtentTestManager.logMessage("checkElementExist: " + true + " --- " + by);
             return true;
         } else {
             LogUtils.error("checkElementExist: " + false + " --- " + by);
-            ExtentTestManager.logMessage("checkElementExist: " + false + " --- " + by);
             return false;
         }
     }
@@ -232,11 +230,9 @@ public class WebUI {
         for (int attempt = 0; attempt < maxRetries; attempt++) {
             if (!getWebElements(by).isEmpty()) {
                 LogUtils.info("Element found successfully on attempt " + (attempt + 1));
-                ExtentTestManager.logMessage("Element found successfully on attempt " + (attempt + 1));
                 return true;
             }
             LogUtils.warn("Element not found. Retrying attempt " + (attempt + 1));
-            ExtentTestManager.logMessage("Element not found. Retrying attempt " + (attempt + 1));
             try {
                 Thread.sleep(waitTimeMillis); // Chờ trước khi thử lại
             } catch (InterruptedException ie) {
@@ -245,7 +241,6 @@ public class WebUI {
         }
         // Trả về false nếu không tìm thấy phần tử sau maxRetries lần
         LogUtils.error("Element not found after " + maxRetries + " attempts.");
-        ExtentTestManager.logMessage("Element not found after " + maxRetries + " attempts.");
         return false;
     }
 
@@ -258,11 +253,9 @@ public class WebUI {
             wait.until(ExpectedConditions.visibilityOfElementLocated(by)); //Chờ cho đến khi driver.findElements(by) tìm thấy ít nhất một phần tử (list không rỗng) - xuất hiện trong DOM.
             highlightElement(by);
             LogUtils.info("Element found: " + by.toString() + " within " + timeoutSeconds + " seconds.");
-            ExtentTestManager.logMessage("Element found: " + by.toString() + " within " + timeoutSeconds + " seconds.");
             return true;
         } catch (TimeoutException e) {
             LogUtils.error("Element not found: " + by.toString() + " within " + timeoutSeconds + " seconds.");
-            ExtentTestManager.logMessage("Element not found: " + by.toString() + " within " + timeoutSeconds + " seconds.");
             return false;
         }
     }
