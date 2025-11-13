@@ -1,5 +1,6 @@
 package hatester.common;
 
+import hatester.constants.FrameworkConstant;
 import hatester.drivers.DriverManager;
 import hatester.helpers.PropertiesHelper;
 import hatester.listeners.TestListener;
@@ -28,10 +29,10 @@ public class BaseTest {
     public void createDriver(@Optional("chrome") String browserName) {
         WebDriver driver;
 
-        if (PropertiesHelper.getValue("BROWSER") == null || PropertiesHelper.getValue("BROWSER").isEmpty()) {
+        if (FrameworkConstant.BROWSER == null || FrameworkConstant.BROWSER.isEmpty()) {
             browserName = browserName;
         } else {
-            browserName = PropertiesHelper.getValue("BROWSER");
+            browserName = FrameworkConstant.BROWSER;
         }
 
         switch (browserName.trim().toLowerCase()) {
@@ -39,9 +40,9 @@ public class BaseTest {
                 LogUtils.info("Launching Chrome browser...");
 
                 ChromeOptions options = new ChromeOptions();
-                if (PropertiesHelper.getValue("HEADLESS").equalsIgnoreCase("true")) {
+                if (FrameworkConstant.HEADLESS.equalsIgnoreCase("true")) {
                     options.addArguments("--headless=new"); //chạy headless
-                    options.addArguments("--window-size=" + PropertiesHelper.getValue("WINDOW-SIZE")); //set kích thước
+                    options.addArguments("--window-size=" + FrameworkConstant.WINDOW_SIZE); //set kích thước
                 }
                 driver = new ChromeDriver();
                 break;
@@ -59,7 +60,7 @@ public class BaseTest {
         }
         DriverManager.setDriver(driver); //Set to ThreadLocal
 
-        if (PropertiesHelper.getValue("HEADLESS").equalsIgnoreCase("false")) {
+        if (FrameworkConstant.HEADLESS.equalsIgnoreCase("false")) {
             DriverManager.getDriver().manage().window().maximize();
         }
         softAssert = new SoftAssert();

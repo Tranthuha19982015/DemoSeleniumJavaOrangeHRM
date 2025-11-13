@@ -1,5 +1,6 @@
 package hatester.helpers;
 
+import hatester.constants.FrameworkConstant;
 import hatester.drivers.DriverManager;
 import hatester.utils.LogUtils;
 import org.monte.media.Format;
@@ -45,7 +46,7 @@ public class CaptureHelper extends ScreenRecorder {
     // Start record video
     public static void startRecord(String videoRecordName) {
         //Tạo thư mục để lưu file video vào
-        File file = new File(SystemHelper.getCurrentDir() + PropertiesHelper.getValue("VIDEO_RECORD_PATH"));
+        File file = new File(SystemHelper.getCurrentDir() + FrameworkConstant.VIDEO_RECORD_PATH);
         //lấy kích thước màn hình để làm kích cỡ của khung video
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         int width = screenSize.width;
@@ -95,7 +96,7 @@ public class CaptureHelper extends ScreenRecorder {
         File source = ts.getScreenshotAs(OutputType.FILE);
 
         //tạo một đối tượng File đại diện cho thư mục chứa ảnh screenshot
-        File theDir = new File(PropertiesHelper.getValue("SCREENSHOT_PATH"));
+        File theDir = new File(FrameworkConstant.SCREENSHOT_PATH);
 
         // Kiểm tra folder tồn tại. Nếu không thì tạo mới folder theo đường dẫn
         if (!theDir.exists()) {
@@ -104,7 +105,7 @@ public class CaptureHelper extends ScreenRecorder {
 
         //Lưu file ảnh với tên cụ thể vào đường dẫn
         try {
-            FileHandler.copy(source, new File(PropertiesHelper.getValue("SCREENSHOT_PATH") + "/" + screenshotName + ".png"));
+            FileHandler.copy(source, new File(FrameworkConstant.SCREENSHOT_PATH + "/" + screenshotName + ".png"));
         } catch (IOException e) {
             throw new RuntimeException();
         }
