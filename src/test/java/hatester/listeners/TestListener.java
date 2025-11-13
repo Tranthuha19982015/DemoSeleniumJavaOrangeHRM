@@ -3,6 +3,7 @@ package hatester.listeners;
 import com.aventstack.extentreports.Status;
 import hatester.helpers.CaptureHelper;
 import hatester.helpers.SystemHelper;
+import hatester.reports.AllureManager;
 import hatester.reports.ExtentReportManager;
 import hatester.reports.ExtentTestManager;
 import hatester.utils.LogUtils;
@@ -71,6 +72,10 @@ public class TestListener implements ITestListener {
         ExtentTestManager.addScreenshot(result.getName());
         ExtentTestManager.logMessage(Status.FAIL, result.getThrowable().toString());
         ExtentTestManager.logMessage(Status.FAIL, result.getName() + " is failed.");
+
+        //Allure Report
+        AllureManager.saveTextLog(result.getName() + " is failed.");
+        AllureManager.saveScreenshotPNG();
 
         CaptureHelper.stopRecord();
     }
