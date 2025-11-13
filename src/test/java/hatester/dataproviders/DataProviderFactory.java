@@ -1,4 +1,4 @@
-package hatester.common;
+package hatester.dataproviders;
 
 import hatester.constants.FrameworkConstant;
 import hatester.helpers.ExcelHelper;

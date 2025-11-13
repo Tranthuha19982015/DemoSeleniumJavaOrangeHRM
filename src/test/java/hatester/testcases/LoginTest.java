@@ -1,7 +1,7 @@
 package hatester.testcases;
 
 import hatester.common.BaseTest;
-import hatester.common.DataProviderFactory;
+import hatester.dataproviders.DataProviderFactory;
 import hatester.pages.LoginPage;
 import org.testng.annotations.Test;
 
