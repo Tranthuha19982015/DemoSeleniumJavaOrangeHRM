@@ -15,7 +15,7 @@ public class PropertiesHelper {
     public static Properties loadAllFiles() {
         LinkedList<String> files = new LinkedList<>();
         files.add("src/test/resources/configs/config.properties");
-        files.add("src/test/resources/configs/message.properties");
+        files.add("src/test/resources/configs/data.properties");
 
         try {
             properties = new Properties();
