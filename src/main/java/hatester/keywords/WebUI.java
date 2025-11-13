@@ -1,7 +1,10 @@
 package hatester.keywords;
 
+import com.aventstack.extentreports.Status;
 import hatester.drivers.DriverManager;
 import hatester.helpers.PropertiesHelper;
+import hatester.reports.ExtentReportManager;
+import hatester.reports.ExtentTestManager;
 import hatester.utils.LogUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
@@ -213,9 +216,11 @@ public class WebUI {
 
         if (listElement.size() > 0) {
             LogUtils.info("checkElementExist: " + true + " --- " + by);
+            ExtentTestManager.logMessage("checkElementExist: " + true + " --- " + by);
             return true;
         } else {
             LogUtils.error("checkElementExist: " + false + " --- " + by);
+            ExtentTestManager.logMessage("checkElementExist: " + false + " --- " + by);
             return false;
         }
     }
@@ -225,9 +230,11 @@ public class WebUI {
         for (int attempt = 0; attempt < maxRetries; attempt++) {
             if (!getWebElements(by).isEmpty()) {
                 LogUtils.info("Element found successfully on attempt " + (attempt + 1));
+                ExtentTestManager.logMessage("Element found successfully on attempt " + (attempt + 1));
                 return true;
             }
             LogUtils.warn("Element not found. Retrying attempt " + (attempt + 1));
+            ExtentTestManager.logMessage("Element not found. Retrying attempt " + (attempt + 1));
             try {
                 Thread.sleep(waitTimeMillis); // Chờ trước khi thử lại
             } catch (InterruptedException ie) {
@@ -236,6 +243,7 @@ public class WebUI {
         }
         // Trả về false nếu không tìm thấy phần tử sau maxRetries lần
         LogUtils.error("Element not found after " + maxRetries + " attempts.");
+        ExtentTestManager.logMessage("Element not found after " + maxRetries + " attempts.");
         return false;
     }
 
@@ -248,9 +256,11 @@ public class WebUI {
             wait.until(ExpectedConditions.visibilityOfElementLocated(by)); //Chờ cho đến khi driver.findElements(by) tìm thấy ít nhất một phần tử (list không rỗng) - xuất hiện trong DOM.
             highlightElement(by);
             LogUtils.info("Element found: " + by.toString() + " within " + timeoutSeconds + " seconds.");
+            ExtentTestManager.logMessage("Element found: " + by.toString() + " within " + timeoutSeconds + " seconds.");
             return true;
         } catch (TimeoutException e) {
             LogUtils.error("Element not found: " + by.toString() + " within " + timeoutSeconds + " seconds.");
+            ExtentTestManager.logMessage("Element not found: " + by.toString() + " within " + timeoutSeconds + " seconds.");
             return false;
         }
     }
@@ -259,11 +269,13 @@ public class WebUI {
         DriverManager.getDriver().get(url);
         waitForPageLoaded();
         LogUtils.info("Open URL: " + url);
+        ExtentTestManager.logMessage("Open URL: " + url);
     }
 
     public static String getCurrentURL() {
         String currentURL = DriverManager.getDriver().getCurrentUrl();
         LogUtils.info("Current URL: " + currentURL);
+        ExtentTestManager.logMessage("Current URL: " + currentURL);
         return currentURL;
     }
 
@@ -271,18 +283,21 @@ public class WebUI {
         sleep(STEP_TIME);
         waitForElementToBeClickable(by).click();
         LogUtils.info("Click to element: " + by.toString());
+        ExtentTestManager.logMessage("Click to element: " + by.toString());
     }
 
     public static void clickToElement(By by, int second) {
         sleep(STEP_TIME);
         waitForElementToBeClickable(by, second).click();
-        LogUtils.info("Click to element: " + by.toString());
+        LogUtils.info("Click to element: " + by.toString() + " with: " + second + "(s)");
+        ExtentTestManager.logMessage("Click to element: " + by.toString() + " with: " + second + "(s)");
     }
 
     public static void clearElementText(By by) {
         sleep(STEP_TIME);
         waitForElementVisible(by).clear();
         LogUtils.info("Clear text of element: " + by.toString());
+        ExtentTestManager.logMessage("Clear text of element: " + by.toString());
     }
 
     //Cách này mạnh hơn .clear(), đặc biệt trong các input được custom bằng JavaScript, vì .clear() đôi khi không xóa hết giá trị.
@@ -292,45 +307,54 @@ public class WebUI {
         element.sendKeys(Keys.CONTROL + "a");
         element.sendKeys(Keys.DELETE);
         LogUtils.info("Clear text of element: " + by.toString());
+        ExtentTestManager.logMessage("Clear text of element: " + by.toString());
     }
 
     public static void setText(By by, String text) {
         sleep(STEP_TIME);
         waitForElementVisible(by).sendKeys(text);
         LogUtils.info("Set text \"" + text + "\" on element: " + by.toString());
+        ExtentTestManager.logMessage("Set text \"" + text + "\" on element: " + by.toString());
     }
 
     public static void setText(By by, String text, int second) {
         sleep(STEP_TIME);
         waitForElementVisible(by, second).sendKeys(text);
-        LogUtils.info("Set text \"" + text + "\" on element: " + by.toString());
+        LogUtils.info("Set text \"" + text + "\" on element: " + by.toString()+ " with: " + second + "(s)");
+        ExtentTestManager.logMessage("Set text \"" + text + "\" on element: " + by.toString()+ " with: " + second + "(s)");
     }
 
     public static void setKey(By by, Keys key) {
         sleep(STEP_TIME);
         waitForElementVisible(by).sendKeys(key);
         LogUtils.info("Set key on element: " + by.toString());
+        ExtentTestManager.logMessage("Set key on element: " + by.toString());
     }
 
     public static void setTextAndKey(By by, String text, Keys key) {
         sleep(STEP_TIME);
         waitForElementVisible(by).sendKeys(text, key);
         LogUtils.info("Set text: \"" + text + "\" and key on element: " + by.toString());
+        ExtentTestManager.logMessage("Set text: \"" + text + "\" and key on element: " + by.toString());
     }
 
     public static String getElementText(By by) {
         sleep(STEP_TIME);
         LogUtils.info("Get text of element: " + by.toString());
+        ExtentTestManager.logMessage("Get text of element: " + by.toString());
         String text = waitForElementVisible(by).getText();
         LogUtils.info("===>TEXT = \"" + text + "\"");
+        ExtentTestManager.logMessage("===>TEXT = \"" + text + "\"");
         return text;
     }
 
     public static String getElementAttribute(By by, String value) {
         sleep(STEP_TIME);
         LogUtils.info("Get attribute of element: " + by.toString());
+        ExtentTestManager.logMessage("Get attribute of element: " + by.toString());
         String text = waitForElementVisible(by).getAttribute(value);
         LogUtils.info("===>Attribute = \"" + text + "\"");
+        ExtentTestManager.logMessage("===>Attribute = \"" + text + "\"");
         return text;
     }
 
@@ -339,8 +363,10 @@ public class WebUI {
     public static String getElementCSSValue(By by, String cssPropertyName) {
         sleep(STEP_TIME);
         LogUtils.info("Get CSS Value: " + cssPropertyName + " of element: " + by.toString());
+        ExtentTestManager.logMessage("Get CSS Value: " + cssPropertyName + " of element: " + by.toString());
         String value = waitForElementVisible(by).getCssValue(cssPropertyName);
         LogUtils.info("===>CSS Value: \"" + value + "\"");
+        ExtentTestManager.logMessage("===>CSS Value: \"" + value + "\"");
         return value;
     }
 
@@ -487,6 +513,7 @@ public class WebUI {
     public static boolean verifyEquals(Object actual, Object expected) {
         waitForPageLoaded();
         LogUtils.info("Verify equals: " + actual + " and " + expected);
+        ExtentTestManager.logMessage("Verify equals: " + actual + " and " + expected);
         boolean check = actual.equals(expected);
         return check;
     }
@@ -494,12 +521,14 @@ public class WebUI {
     public static void assertEquals(Object actual, Object expected, String message) {
         waitForPageLoaded();
         LogUtils.info("Assert equals: " + actual + " and " + expected);
+        ExtentTestManager.logMessage("Assert equals: " + actual + " and " + expected);
         Assert.assertEquals(actual, expected, message);
     }
 
     public static boolean verifyContains(String actual, String expected) {
         waitForPageLoaded();
         LogUtils.info("Verify contains: " + actual + " and " + expected);
+        ExtentTestManager.logMessage("Verify contains: " + actual + " and " + expected);
         boolean check = actual.contains(expected);
         return check;
     }
@@ -507,6 +536,7 @@ public class WebUI {
     public static void assertContains(String actual, String expected, String message) {
         waitForPageLoaded();
         LogUtils.info("Assert contains: " + actual + " and " + expected);
+        ExtentTestManager.logMessage("Assert contains: " + actual + " and " + expected);
         boolean check = actual.contains(expected);
         Assert.assertTrue(check, message);
     }
