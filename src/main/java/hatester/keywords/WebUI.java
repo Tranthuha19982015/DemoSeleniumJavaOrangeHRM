@@ -3,9 +3,11 @@ package hatester.keywords;
 import com.aventstack.extentreports.Status;
 import hatester.drivers.DriverManager;
 import hatester.helpers.PropertiesHelper;
+import hatester.reports.AllureManager;
 import hatester.reports.ExtentReportManager;
 import hatester.reports.ExtentTestManager;
 import hatester.utils.LogUtils;
+import io.qameta.allure.Step;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -265,6 +267,7 @@ public class WebUI {
         }
     }
 
+    @Step("Open URL: {0}")
     public static void openURL(String url) {
         DriverManager.getDriver().get(url);
         waitForPageLoaded();
@@ -272,6 +275,7 @@ public class WebUI {
         ExtentTestManager.logMessage("Open URL: " + url);
     }
 
+    @Step("Current URL: {0}")
     public static String getCurrentURL() {
         String currentURL = DriverManager.getDriver().getCurrentUrl();
         LogUtils.info("Current URL: " + currentURL);
@@ -279,6 +283,7 @@ public class WebUI {
         return currentURL;
     }
 
+    @Step("Click to element: {0}")
     public static void clickToElement(By by) {
         sleep(STEP_TIME);
         waitForElementToBeClickable(by).click();
@@ -286,6 +291,7 @@ public class WebUI {
         ExtentTestManager.logMessage("Click to element: " + by.toString());
     }
 
+    @Step("Click to element: {0} with: {1}(s)")
     public static void clickToElement(By by, int second) {
         sleep(STEP_TIME);
         waitForElementToBeClickable(by, second).click();
@@ -293,6 +299,7 @@ public class WebUI {
         ExtentTestManager.logMessage("Click to element: " + by.toString() + " with: " + second + "(s)");
     }
 
+    @Step("Clear text of element: {0}")
     public static void clearElementText(By by) {
         sleep(STEP_TIME);
         waitForElementVisible(by).clear();
@@ -301,6 +308,7 @@ public class WebUI {
     }
 
     //Cách này mạnh hơn .clear(), đặc biệt trong các input được custom bằng JavaScript, vì .clear() đôi khi không xóa hết giá trị.
+    @Step("Clear text of element: {0}")
     public static void clearElementTextActions(By by) {
         sleep(STEP_TIME);
         WebElement element = waitForElementVisible(by);
@@ -310,6 +318,7 @@ public class WebUI {
         ExtentTestManager.logMessage("Clear text of element: " + by.toString());
     }
 
+    @Step("Set text {1} on element: {0}")
     public static void setText(By by, String text) {
         sleep(STEP_TIME);
         waitForElementVisible(by).sendKeys(text);
@@ -317,6 +326,7 @@ public class WebUI {
         ExtentTestManager.logMessage("Set text \"" + text + "\" on element: " + by.toString());
     }
 
+    @Step("Set text {1} on element: {0} with: {2}")
     public static void setText(By by, String text, int second) {
         sleep(STEP_TIME);
         waitForElementVisible(by, second).sendKeys(text);
@@ -324,6 +334,7 @@ public class WebUI {
         ExtentTestManager.logMessage("Set text \"" + text + "\" on element: " + by.toString()+ " with: " + second + "(s)");
     }
 
+    @Step("Set key on element: {0}")
     public static void setKey(By by, Keys key) {
         sleep(STEP_TIME);
         waitForElementVisible(by).sendKeys(key);
@@ -331,6 +342,7 @@ public class WebUI {
         ExtentTestManager.logMessage("Set key on element: " + by.toString());
     }
 
+    @Step("Set text {1} and key on element: {0}")
     public static void setTextAndKey(By by, String text, Keys key) {
         sleep(STEP_TIME);
         waitForElementVisible(by).sendKeys(text, key);
@@ -338,6 +350,7 @@ public class WebUI {
         ExtentTestManager.logMessage("Set text: \"" + text + "\" and key on element: " + by.toString());
     }
 
+    @Step("Get text of element: {0}")
     public static String getElementText(By by) {
         sleep(STEP_TIME);
         LogUtils.info("Get text of element: " + by.toString());
@@ -345,9 +358,11 @@ public class WebUI {
         String text = waitForElementVisible(by).getText();
         LogUtils.info("===>TEXT = \"" + text + "\"");
         ExtentTestManager.logMessage("===>TEXT = \"" + text + "\"");
+        AllureManager.saveTextLog("===>TEXT = \"" + text + "\"");
         return text;
     }
 
+    @Step("Get attribute of element: {0}")
     public static String getElementAttribute(By by, String value) {
         sleep(STEP_TIME);
         LogUtils.info("Get attribute of element: " + by.toString());
@@ -355,11 +370,13 @@ public class WebUI {
         String text = waitForElementVisible(by).getAttribute(value);
         LogUtils.info("===>Attribute = \"" + text + "\"");
         ExtentTestManager.logMessage("===>Attribute = \"" + text + "\"");
+        AllureManager.saveTextLog("===>Attribute = \"" + text + "\"");
         return text;
     }
 
     //Dùng nhiều trong UI testing (visual check, style validation).
     //Trả về chuỗi, thường ở dạng chuẩn của browser (ví dụ: rgba(0, 0, 0, 1) thay vì #000)
+    @Step("Get CSS Value: {1} of element: {0}")
     public static String getElementCSSValue(By by, String cssPropertyName) {
         sleep(STEP_TIME);
         LogUtils.info("Get CSS Value: " + cssPropertyName + " of element: " + by.toString());
@@ -367,6 +384,7 @@ public class WebUI {
         String value = waitForElementVisible(by).getCssValue(cssPropertyName);
         LogUtils.info("===>CSS Value: \"" + value + "\"");
         ExtentTestManager.logMessage("===>CSS Value: \"" + value + "\"");
+        AllureManager.saveTextLog("===>CSS Value: \"" + value + "\"");
         return value;
     }
 
