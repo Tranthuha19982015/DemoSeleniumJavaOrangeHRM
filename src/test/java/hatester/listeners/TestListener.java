@@ -68,6 +68,7 @@ public class TestListener implements ITestListener {
         //Write log to file
         //Write status to report
 
+
         //Extent Report
         ExtentTestManager.addScreenshot(result.getName());
         ExtentTestManager.logMessage(Status.FAIL, result.getThrowable().toString());
