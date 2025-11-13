@@ -261,6 +261,12 @@ public class WebUI {
         LogUtils.info("Open URL: " + url);
     }
 
+    public static String getCurrentURL() {
+        String currentURL = DriverManager.getDriver().getCurrentUrl();
+        LogUtils.info("Current URL: " + currentURL);
+        return currentURL;
+    }
+
     public static void clickToElement(By by) {
         sleep(STEP_TIME);
         waitForElementToBeClickable(by).click();
