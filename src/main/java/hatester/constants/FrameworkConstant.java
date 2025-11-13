@@ -7,6 +7,10 @@ public class FrameworkConstant {
     private FrameworkConstant() {
     }
 
+//    static {
+//        PropertiesHelper.loadAllFiles();
+//    }
+
     public static String EXCEL_DATA_FILE_PATH = PropertiesHelper.getValue("EXCEL_DATA_FILE_PATH");
 
     public static String BROWSER = PropertiesHelper.getValue("BROWSER");
