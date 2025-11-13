@@ -76,7 +76,7 @@ public class TestListener implements ITestListener {
 
         //Allure Report
         AllureManager.saveTextLog(result.getName() + " is failed.");
-        AllureManager.saveScreenshotPNG();
+//        AllureManager.saveScreenshotPNG();
 
         CaptureHelper.stopRecord();
     }
