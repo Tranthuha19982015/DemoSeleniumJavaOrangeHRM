@@ -271,7 +271,7 @@ public class ExcelHelper {
         LogUtils.info("Excel Path: " + excelPath);
         Object[][] data = null;
 
-        try {
+        try(FileInputStream fis = new FileInputStream(excelPath)) {
             File f = new File(excelPath);
             if (!f.exists()) {
                 try {
@@ -281,8 +281,6 @@ public class ExcelHelper {
                     e.printStackTrace();
                 }
             }
-
-            FileInputStream fis = new FileInputStream(excelPath);
 
             wb = new XSSFWorkbook(fis);
 
