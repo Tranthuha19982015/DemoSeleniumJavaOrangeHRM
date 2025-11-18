@@ -23,7 +23,7 @@ public class LoginPage extends BasePage {
     }
 
     public void verifyImageLoginDisplay() {
-        Assert.assertTrue(WebUI.checkElementExist(imgLoginPage,5), "The img page is not displayed.");
+        Assert.assertTrue(WebUI.checkElementExist(imgLoginPage, 5), "The img page is not displayed.");
     }
 
     public void enterEmail(String email) {
@@ -50,8 +50,8 @@ public class LoginPage extends BasePage {
     public void loginRISE() {
         openRISE(FrameworkConstant.URL_RISE);
         verifyImageLoginDisplay();
-        enterEmail(PropertiesHelper.getValue("EMAIL_ADDRESS"));
-        enterPassword(PropertiesHelper.getValue("PASSWORD"));
+        enterEmail(FrameworkConstant.EMAIL_ADMIN);
+        enterPassword(FrameworkConstant.PASSWORD_ADMIN);
         clickSignIn();
         verifyLoginSuccess();
     }

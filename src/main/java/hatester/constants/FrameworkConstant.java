@@ -15,6 +15,8 @@ public class FrameworkConstant {
 
     public static String BROWSER = PropertiesHelper.getValue("BROWSER");
     public static String URL_RISE = PropertiesHelper.getValue("URL");
+    public static String EMAIL_ADMIN = PropertiesHelper.getValue("EMAIL_ADDRESS");
+    public static String PASSWORD_ADMIN = PropertiesHelper.getValue("PASSWORD");
     public static String WINDOW_SIZE = PropertiesHelper.getValue("WINDOW-SIZE");
     public static String HEADLESS = PropertiesHelper.getValue("HEADLESS");
     public static String SCREENSHOT_PATH = PropertiesHelper.getValue("SCREENSHOT_PATH");
