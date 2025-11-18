@@ -26,6 +26,8 @@ public class ClientsTab extends ClientsPageCommon {
         return By.xpath(xpathButtonEdit);
     }
 
+    private By buttonAddContact = By.xpath("//a[normalize-space()='Add contact' and @data-title='Add contact']");
+
     //Pop-up Add client
     private By headerAddClient = By.xpath("//h4[@id='ajaxModalTitle']");
     //radio
