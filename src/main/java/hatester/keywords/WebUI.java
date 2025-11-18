@@ -265,14 +265,14 @@ public class WebUI {
         DriverManager.getDriver().get(url);
         waitForPageLoaded();
         LogUtils.info("Open URL: " + url);
-        ExtentTestManager.logMessage("Open URL: " + url);
+        ExtentTestManager.logMessage(Status.PASS, "Open URL: " + url);
     }
 
     @Step("Current URL: {0}")
     public static String getCurrentURL() {
         String currentURL = DriverManager.getDriver().getCurrentUrl();
         LogUtils.info("Current URL: " + currentURL);
-        ExtentTestManager.logMessage("Current URL: " + currentURL);
+        ExtentTestManager.logMessage(Status.PASS, "Current URL: " + currentURL);
         return currentURL;
     }
 
@@ -281,7 +281,7 @@ public class WebUI {
         sleep(STEP_TIME);
         waitForElementToBeClickable(by).click();
         LogUtils.info("Click to element: " + by.toString());
-        ExtentTestManager.logMessage("Click to element: " + by.toString());
+        ExtentTestManager.logMessage(Status.PASS, "Click on element " + by.toString());
     }
 
     @Step("Click to element: {0} with: {1}(s)")
@@ -289,7 +289,7 @@ public class WebUI {
         sleep(STEP_TIME);
         waitForElementToBeClickable(by, second).click();
         LogUtils.info("Click to element: " + by.toString() + " with: " + second + "(s)");
-        ExtentTestManager.logMessage("Click to element: " + by.toString() + " with: " + second + "(s)");
+        ExtentTestManager.logMessage(Status.PASS, "Click to element: " + by.toString() + " with: " + second + "(s)");
     }
 
     @Step("Clear text of element: {0}")
@@ -297,7 +297,7 @@ public class WebUI {
         sleep(STEP_TIME);
         waitForElementVisible(by).clear();
         LogUtils.info("Clear text of element: " + by.toString());
-        ExtentTestManager.logMessage("Clear text of element: " + by.toString());
+        ExtentTestManager.logMessage(Status.PASS, "Clear text of element: " + by.toString());
     }
 
     //Cách này mạnh hơn .clear(), đặc biệt trong các input được custom bằng JavaScript, vì .clear() đôi khi không xóa hết giá trị.
@@ -308,7 +308,7 @@ public class WebUI {
         element.sendKeys(Keys.CONTROL + "a");
         element.sendKeys(Keys.DELETE);
         LogUtils.info("Clear text of element: " + by.toString());
-        ExtentTestManager.logMessage("Clear text of element: " + by.toString());
+        ExtentTestManager.logMessage(Status.PASS, "Clear text of element: " + by.toString());
     }
 
     @Step("Set text {1} on element: {0}")
@@ -316,15 +316,15 @@ public class WebUI {
         sleep(STEP_TIME);
         waitForElementVisible(by).sendKeys(text);
         LogUtils.info("Set text \"" + text + "\" on element: " + by.toString());
-        ExtentTestManager.logMessage("Set text \"" + text + "\" on element: " + by.toString());
+        ExtentTestManager.logMessage(Status.PASS, "Set text \"" + text + "\" on element: " + by.toString());
     }
 
     @Step("Set text {1} on element: {0} with: {2}")
     public static void setText(By by, String text, int second) {
         sleep(STEP_TIME);
         waitForElementVisible(by, second).sendKeys(text);
-        LogUtils.info("Set text \"" + text + "\" on element: " + by.toString()+ " with: " + second + "(s)");
-        ExtentTestManager.logMessage("Set text \"" + text + "\" on element: " + by.toString()+ " with: " + second + "(s)");
+        LogUtils.info("Set text \"" + text + "\" on element: " + by.toString() + " with: " + second + "(s)");
+        ExtentTestManager.logMessage(Status.PASS, "Set text \"" + text + "\" on element: " + by.toString() + " with: " + second + "(s)");
     }
 
     @Step("Set key on element: {0}")
@@ -332,7 +332,7 @@ public class WebUI {
         sleep(STEP_TIME);
         waitForElementVisible(by).sendKeys(key);
         LogUtils.info("Set key on element: " + by.toString());
-        ExtentTestManager.logMessage("Set key on element: " + by.toString());
+        ExtentTestManager.logMessage(Status.PASS, "Set key on element: " + by.toString());
     }
 
     @Step("Set text {1} and key on element: {0}")
@@ -340,17 +340,17 @@ public class WebUI {
         sleep(STEP_TIME);
         waitForElementVisible(by).sendKeys(text, key);
         LogUtils.info("Set text: \"" + text + "\" and key on element: " + by.toString());
-        ExtentTestManager.logMessage("Set text: \"" + text + "\" and key on element: " + by.toString());
+        ExtentTestManager.logMessage(Status.PASS, "Set text: \"" + text + "\" and key on element: " + by.toString());
     }
 
     @Step("Get text of element: {0}")
     public static String getElementText(By by) {
         sleep(STEP_TIME);
         LogUtils.info("Get text of element: " + by.toString());
-        ExtentTestManager.logMessage("Get text of element: " + by.toString());
         String text = waitForElementVisible(by).getText();
         LogUtils.info("===>TEXT = \"" + text + "\"");
-        ExtentTestManager.logMessage("===>TEXT = \"" + text + "\"");
+        ExtentTestManager.logMessage(Status.PASS, "Get text of element: " + by.toString());
+        ExtentTestManager.logMessage(Status.INFO, "===>TEXT = \"" + text + "\"");
         AllureManager.saveTextLog("===>TEXT = \"" + text + "\"");
         return text;
     }
@@ -359,10 +359,10 @@ public class WebUI {
     public static String getElementAttribute(By by, String value) {
         sleep(STEP_TIME);
         LogUtils.info("Get attribute of element: " + by.toString());
-        ExtentTestManager.logMessage("Get attribute of element: " + by.toString());
         String text = waitForElementVisible(by).getAttribute(value);
         LogUtils.info("===>Attribute = \"" + text + "\"");
-        ExtentTestManager.logMessage("===>Attribute = \"" + text + "\"");
+        ExtentTestManager.logMessage(Status.PASS, "Get attribute of element: " + by.toString());
+        ExtentTestManager.logMessage(Status.INFO, "===>Attribute = \"" + text + "\"");
         AllureManager.saveTextLog("===>Attribute = \"" + text + "\"");
         return text;
     }
@@ -373,10 +373,10 @@ public class WebUI {
     public static String getElementCSSValue(By by, String cssPropertyName) {
         sleep(STEP_TIME);
         LogUtils.info("Get CSS Value: " + cssPropertyName + " of element: " + by.toString());
-        ExtentTestManager.logMessage("Get CSS Value: " + cssPropertyName + " of element: " + by.toString());
         String value = waitForElementVisible(by).getCssValue(cssPropertyName);
         LogUtils.info("===>CSS Value: \"" + value + "\"");
-        ExtentTestManager.logMessage("===>CSS Value: \"" + value + "\"");
+        ExtentTestManager.logMessage(Status.PASS, "Get CSS Value: " + cssPropertyName + " of element: " + by.toString());
+        ExtentTestManager.logMessage(Status.INFO, "===>CSS Value: \"" + value + "\"");
         AllureManager.saveTextLog("===>CSS Value: \"" + value + "\"");
         return value;
     }
