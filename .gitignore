@@ -12,7 +12,7 @@ target/
 *.iws
 *.iml
 *.ipr
-.idea/material_theme_project_new.xml
+.material_theme_project_new.idea
 
 ### Eclipse ###
 .apt_generated
