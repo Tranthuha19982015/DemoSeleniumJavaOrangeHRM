@@ -1,5 +1,6 @@
 package hatester.listeners;
 
+import hatester.constants.FrameworkConstant;
 import hatester.drivers.DriverManager;
 import hatester.helpers.PropertiesHelper;
 import io.qameta.allure.Allure;
@@ -39,7 +40,7 @@ public class AllureListener implements TestLifecycleListener {
 
     @Override
     public void beforeTestStop(TestResult result) {
-        if (PropertiesHelper.getValue("SCREENSHOT_SUCCESS").equals("true")) {
+        if (FrameworkConstant.SCREENSHOT_SUCCESS.equals("true")) {
             if (result.getStatus().equals(Status.PASSED)) {
                 if (DriverManager.getDriver() != null) {
                     Allure.addAttachment(result.getName() + "_Passed_Screenshot",
@@ -47,7 +48,7 @@ public class AllureListener implements TestLifecycleListener {
                 }
             }
         }
-        if (PropertiesHelper.getValue("SCREENSHOT_FAILURE").equals("true")) {
+        if (FrameworkConstant.SCREENSHOT_FAILURE.equals("true")) {
             if (result.getStatus().equals(Status.FAILED)) {
                 if (DriverManager.getDriver() != null) {
                     Allure.addAttachment(result.getName() + "_Failed_Screenshot",

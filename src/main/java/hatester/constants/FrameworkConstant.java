@@ -21,4 +21,8 @@ public class FrameworkConstant {
     public static String HEADLESS = PropertiesHelper.getValue("HEADLESS");
     public static String SCREENSHOT_PATH = PropertiesHelper.getValue("SCREENSHOT_PATH");
     public static String VIDEO_RECORD_PATH = PropertiesHelper.getValue("VIDEO_RECORD_PATH");
+    public static String SCREENSHOT_ALL_STEP = PropertiesHelper.getValue("SCREENSHOT_ALL_STEP");
+    public static String SCREENSHOT_FAILURE = PropertiesHelper.getValue("SCREENSHOT_FAILURE");
+    public static String SCREENSHOT_SUCCESS = PropertiesHelper.getValue("SCREENSHOT_SUCCESS");
+    public static String VIDEO_RECORD = PropertiesHelper.getValue("VIDEO_RECORD");
 }
