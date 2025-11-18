@@ -1,6 +1,7 @@
 package hatester.listeners;
 
 import com.aventstack.extentreports.Status;
+import hatester.constants.FrameworkConstant;
 import hatester.helpers.CaptureHelper;
 import hatester.helpers.PropertiesHelper;
 import hatester.helpers.SystemHelper;
@@ -43,7 +44,7 @@ public class TestListener implements ITestListener {
     public void onTestStart(ITestResult result) {
         LogUtils.info("Test Started: " + result.getName());
         //Write log to file
-        if (PropertiesHelper.getValue("VIDEO_RECORD").equals("true")) {
+        if (FrameworkConstant.VIDEO_RECORD.equals("true")) {
             CaptureHelper.startRecord(result.getName());
         }
         //Bắt đầu ghi 1 TCs mới vào Extent Report
@@ -57,11 +58,11 @@ public class TestListener implements ITestListener {
         //Write status to report
 
         //Extent Report
-        if (PropertiesHelper.getValue("SCREENSHOT_SUCCESS").equals("true")) {
+        if( FrameworkConstant.SCREENSHOT_SUCCESS.equals("true")) {
             ExtentTestManager.logMessage(Status.PASS, result.getName() + " is passed.");
         }
 
-        if (PropertiesHelper.getValue("VIDEO_RECORD").equals("true")) {
+        if (FrameworkConstant.VIDEO_RECORD.equals("true")) {
             CaptureHelper.stopRecord();
         }
     }
@@ -77,13 +78,13 @@ public class TestListener implements ITestListener {
 
 
         //Extent Report
-        if (PropertiesHelper.getValue("SCREENSHOT_FAILURE").equals("true")) {
+        if (FrameworkConstant.SCREENSHOT_FAILURE.equals("true")) {
             ExtentTestManager.addScreenshot(result.getName());
             ExtentTestManager.logMessage(Status.FAIL, result.getThrowable().toString());
             ExtentTestManager.logMessage(Status.FAIL, result.getName() + " is failed.");
         }
 
-        if (PropertiesHelper.getValue("VIDEO_RECORD").equals("true")) {
+        if (FrameworkConstant.VIDEO_RECORD.equals("true")) {
             CaptureHelper.stopRecord();
         }
     }
@@ -97,7 +98,7 @@ public class TestListener implements ITestListener {
         //Extent Report
         ExtentTestManager.logMessage(Status.SKIP, result.getThrowable().toString());
 
-        if (PropertiesHelper.getValue("VIDEO_RECORD").equals("true")) {
+        if (FrameworkConstant.VIDEO_RECORD.equals("true")) {
             CaptureHelper.stopRecord();
         }
     }
