@@ -108,4 +108,12 @@ public class ClientsTab extends ClientsPageCommon {
         WebUI.waitForPageLoaded();
         Assert.assertTrue(WebUI.checkElementExist(firstRowNameClients(name)), "The client was not added correctly just now.");
     }
+
+    public void viewClient(String name) {
+        WebUI.clickToElement(firstRowNameClients(name));
+    }
+
+    public ContactsTab clickButtonAddContact() {
+        return new ContactsTab();
+    }
 }
