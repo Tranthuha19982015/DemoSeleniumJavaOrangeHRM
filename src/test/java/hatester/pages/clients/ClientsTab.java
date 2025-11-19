@@ -4,6 +4,7 @@ import hatester.keywords.WebUI;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.testng.Assert;
+import org.testng.asserts.SoftAssert;
 
 import java.util.Hashtable;
 
@@ -50,6 +51,12 @@ public class ClientsTab extends ClientsPageCommon {
     private By inputVATNumber = By.xpath("//form[@id='client-form']/descendant::input[@id='vat_number']");
     private By inputGSTNumber = By.xpath("//form[@id='client-form']/descendant::input[@id='gst_number']");
     private By inputClientsGroups = By.xpath("((//label[@for='groups']/following-sibling::div)/descendant::ul)/descendant::input");
+
+    private By getValueClientsGroups(String value) {
+        String xpathValue = "(//label[@for='groups']/following-sibling::div)/descendant::li[normalize-space()='" + value + "']";
+        return By.xpath(xpathValue);
+    }
+
     private By inputLabel = By.xpath("((//label[@for='client_labels']/following-sibling::div)/descendant::ul)/descendant::input");
     //button
     private By buttonClose = By.xpath("//button[@id='save-and-continue-button']/preceding-sibling::button[normalize-space()='Close']");
@@ -65,28 +72,31 @@ public class ClientsTab extends ClientsPageCommon {
         Assert.assertTrue(WebUI.checkElementExist(headerAddClient, 10), "The header Add Client is not display!");
     }
 
-    public void fillDataNewClient(Hashtable<String, String> data) {
-        if (data.get("TYPE").equalsIgnoreCase("Person")) {
+    public void fillDataNewClient(String type, String companyName, String owner, String address, String city, String state, String zip,
+                                  String country, String phone, String website, String vat, String gst, String clientGroups, String labels) {
+        if (type.equalsIgnoreCase("Person")) {
             WebUI.clickToElement(radioButtonTypePerson);
         } else {
-            WebUI.clickToElement(radioButtonTypeOrganization);
+            if (WebUI.waitForElementVisible(radioButtonTypeOrganization).isSelected() == false) {
+                WebUI.clickToElement(radioButtonTypeOrganization);
+            }
         }
-        WebUI.setText(inputCompanyName, data.get("COMPANY_NAME"));
+        WebUI.setText(inputCompanyName, companyName);
 
         WebUI.clickToElement(dropdownOwner);
-        WebUI.setTextAndKey(inputSearchOwner, data.get("OWNER"), Keys.ENTER);
+        WebUI.setTextAndKey(inputSearchOwner, owner, Keys.ENTER);
 
-        WebUI.setText(inputAddress, data.get("ADDRESS"));
-        WebUI.setText(inputCity, data.get("CITY"));
-        WebUI.setText(inputState, data.get("STATE"));
-        WebUI.setText(inputZip, data.get("ZIP"));
-        WebUI.setText(inputCountry, data.get("COUNTRY"));
-        WebUI.setText(inputPhone, data.get("PHONE"));
-        WebUI.setText(inputWebsite, data.get("WEBSITE"));
-        WebUI.setText(inputVATNumber, data.get("VAT"));
-        WebUI.setText(inputGSTNumber, data.get("GST"));
-        WebUI.setTextAndKey(inputClientsGroups, data.get("CLIENT_GROUPS"), Keys.ENTER);
-        WebUI.setTextAndKey(inputLabel, data.get("LABELS"), Keys.ENTER);
+        WebUI.setText(inputAddress, address);
+        WebUI.setText(inputCity, city);
+        WebUI.setText(inputState, state);
+        WebUI.setText(inputZip, zip);
+        WebUI.setText(inputCountry, country);
+        WebUI.setText(inputPhone, phone);
+        WebUI.setText(inputWebsite, website);
+        WebUI.setText(inputVATNumber, vat);
+        WebUI.setText(inputGSTNumber, gst);
+        WebUI.setTextAndKey(inputClientsGroups, clientGroups, Keys.ENTER);
+        WebUI.setTextAndKey(inputLabel, labels, Keys.ENTER);
     }
 
     public void clickButtonSave() {
@@ -97,8 +107,8 @@ public class ClientsTab extends ClientsPageCommon {
         WebUI.clickToElement(buttonSaveAndContinue);
     }
 
-    public void verifyClientNameRequire(String name) {
-        Assert.assertFalse(WebUI.checkElementExist(errorMessageRequireName, 5), "Client name is null.");
+    public void verifyClientNameRequire() {
+        Assert.assertFalse(WebUI.checkElementExist(errorMessageRequireName, 5), "Client name is not null.");
     }
 
     public void searchAndCheckNewClient(String name) {
@@ -107,6 +117,32 @@ public class ClientsTab extends ClientsPageCommon {
         WebUI.setTextAndKey(inputSearchClients, name, Keys.ENTER);
         WebUI.waitForPageLoaded();
         Assert.assertTrue(WebUI.checkElementExist(firstRowNameClients(name)), "The client was not added correctly just now.");
+    }
+
+    public void clickButtonEdit(String name) {
+        WebUI.clickToElement(buttonEdit(name));
+    }
+
+    public void verifyNewClientOnEdit(SoftAssert softAssert, String type, String companyName, String owner, String address, String city, String state,
+                                      String zip, String country, String phone, String website, String vat, String gst, String clientGroups, String labels) {
+        if (type.equalsIgnoreCase("Person")) {
+            softAssert.assertTrue(WebUI.waitForElementVisible(radioButtonTypePerson).isSelected(),"The type selected for this client is incorrect.");
+        } else {
+            softAssert.assertTrue(WebUI.waitForElementVisible(radioButtonTypeOrganization).isSelected(),"The type selected for this client is incorrect.");
+        }
+        softAssert.assertEquals(WebUI.getElementAttribute(inputCompanyName, "value"), companyName, "The Name entered for the new client is incorrect.");
+        softAssert.assertEquals(WebUI.getElementText(dropdownOwner), owner, "The Owner selected for the new client is incorrect");
+        softAssert.assertEquals(WebUI.getElementAttribute(inputAddress, "value"), address, "The Address entered for the new client is incorrect.");
+        softAssert.assertEquals(WebUI.getElementAttribute(inputCity, "value"), city, "The City entered for the new client is incorrect.");
+        softAssert.assertEquals(WebUI.getElementAttribute(inputState, "value"), state, "The State entered for the new client is incorrect.");
+        softAssert.assertEquals(WebUI.getElementAttribute(inputZip, "value"), zip, "The Zip entered for the new client is incorrect.");
+        softAssert.assertEquals(WebUI.getElementAttribute(inputCountry, "value"), country, "The Country entered for the new client is incorrect.");
+        softAssert.assertEquals(WebUI.getElementAttribute(inputPhone, "value"), phone, "The Phone entered for the new client is incorrect.");
+        softAssert.assertEquals(WebUI.getElementAttribute(inputWebsite, "value"), website, "The Website entered for the new client is incorrect.");
+        softAssert.assertEquals(WebUI.getElementAttribute(inputVATNumber, "value"), vat, "The VAT Number entered for the new client is incorrect.");
+        softAssert.assertEquals(WebUI.getElementAttribute(inputGSTNumber, "value"), gst, "The GST Number entered for the new client is incorrect.");
+        softAssert.assertTrue(WebUI.checkElementExist(getValueClientsGroups(clientGroups),5), "The GST Number entered for the new client is incorrect.");
+        softAssert.assertEquals(WebUI.getElementAttribute(inputGSTNumber, "value"), gst, "The GST Number entered for the new client is incorrect.");
     }
 
     public void viewClient(String name) {
